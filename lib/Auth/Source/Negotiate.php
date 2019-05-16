@@ -293,6 +293,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
      * @throws \SimpleSAML\Error\BadRequest If couldn't determine the auth source.
      * @throws \SimpleSAML\Error\NoState
      * @throws \SimpleSAML\Error\Exception
+     * @return void
      */
     public static function external() {
         if (!isset($_REQUEST['AuthState'])) {
