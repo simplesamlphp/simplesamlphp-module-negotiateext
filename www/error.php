@@ -8,7 +8,7 @@ if (empty($_SERVER['REDIRECT_URL'])) {
     throw new \SimpleSAML\Error\NoState();
 }
 
-$url = str_replace( '/auth.php', '/backend.php', $_SERVER['REDIRECT_URL'] ) . '?' . $_SERVER['REDIRECT_QUERY_STRING'];
+$url = str_replace('/auth.php', '/backend.php', $_SERVER['REDIRECT_URL']).'?'.$_SERVER['REDIRECT_QUERY_STRING'];
 
 header("Refresh: 0;url='$url'");
 
