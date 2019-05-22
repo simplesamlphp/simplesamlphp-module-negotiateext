@@ -238,6 +238,10 @@ class Negotiate extends \SimpleSAML\Auth\Source
         Logger::debug('Negotiate: fallBack to '.$authId);
         $source = \SimpleSAML\Auth\Source::getById($authId);
 
+        if ($source === null) {
+            throw new \Exception('Could not find authentication source with id '.$authId);
+        }
+
         try {
             $source->authenticate($state);
         } catch (\SimpleSAML\Error\Exception $e) {
@@ -407,6 +411,10 @@ class Negotiate extends \SimpleSAML\Auth\Source
             parent::logout($state);
         } else {
             $source = \SimpleSAML\Auth\Source::getById($authId);
+            if ($source === null) {
+                throw new \Exception('Could not find authentication source with id '.$authId);
+            }
+
             $source->logout($state);
         }
     }
