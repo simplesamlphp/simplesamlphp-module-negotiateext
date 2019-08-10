@@ -39,7 +39,7 @@
     },
     "require-dev": {
         "simplesamlphp/simplesamlphp": "^1.17",
-        "phpunit/phpunit": "~5.7"
+        "simplesamlphp/simplesamlphp-test-framework": "~0.0.8"
     },
     "support": {
         "issues": "https://github.com/tvdijen/simplesamlphp-module-negotiate-ext/issues",
