@@ -38,8 +38,8 @@
         "webmozart/assert": "~1.4"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp": "^1.17",
-        "simplesamlphp/simplesamlphp-test-framework": "~0.0.8"
+        "simplesamlphp/simplesamlphp": "^1.18",
+        "simplesamlphp/simplesamlphp-test-framework": "~0.0.15"
     },
     "support": {
         "issues": "https://github.com/tvdijen/simplesamlphp-module-negotiate-ext/issues",
