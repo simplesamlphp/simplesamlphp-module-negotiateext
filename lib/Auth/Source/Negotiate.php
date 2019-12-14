@@ -305,6 +305,8 @@ class Negotiate extends \SimpleSAML\Auth\Source
         }
         Logger::debug('Negotiate: external returned');
         $sid = \SimpleSAML\Auth\State::parseStateID($_REQUEST['AuthState']);
+
+        
         $state = \SimpleSAML\Auth\State::loadState($_REQUEST['AuthState'], self::STAGEID, true);
         if ($state === null) {
             if ($sid['url'] === null) {
@@ -331,8 +333,11 @@ class Negotiate extends \SimpleSAML\Auth\Source
                 throw new \SimpleSAML\Error\Exception('Authentication source type changed.');
             }
             Logger::debug('Negotiate - authenticate(): looking for Negotate');
+            /** @psalm-var array $state */
             $source->externalAuth($state);
         }
+
+        /** @psalm-var array $state */
         self::fallBack($state);
         assert(false);
     }
