@@ -8,6 +8,7 @@
  *
  */
 
+/** @var arary $state */
 $state = \SimpleSAML\Auth\State::loadState(
     $_REQUEST['AuthState'],
     \SimpleSAML\Module\negotiateext\Auth\Source\Negotiate::STAGEID
