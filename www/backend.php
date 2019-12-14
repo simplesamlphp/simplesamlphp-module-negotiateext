@@ -12,10 +12,13 @@ if (!isset($_REQUEST['AuthState'])) {
     throw new \SimpleSAML\Error\BadRequest('Missing "AuthState" parameter.');
 }
 
-/** @var arary $state */
-$state = \SimpleSAML\Auth\State::loadState($_REQUEST['AuthState'], \SimpleSAML\Module\negotiateext\Auth\Source\Negotiate::STAGEID);
+/** @var array $state */
+$state = \SimpleSAML\Auth\State::loadState(
+    $_REQUEST['AuthState'],
+    \SimpleSAML\Module\negotiateext\Auth\Source\Negotiate::STAGEID
+);
 
-\SimpleSAML\Logger::debug('backend - fallback: '.$state['LogoutState']['negotiate:backend']);
+\SimpleSAML\Logger::debug('backend - fallback: ' . $state['LogoutState']['negotiate:backend']);
 
 \SimpleSAML\Module\negotiateext\Auth\Source\Negotiate::fallBack($state);
 

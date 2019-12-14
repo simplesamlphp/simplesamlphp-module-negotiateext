@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Mathias Meisfjordskar, University of Oslo.
  *         <mathias.meisfjordskar@usit.uio.no>
@@ -15,6 +16,6 @@ $params = [
 $globalConfig = \SimpleSAML\Configuration::getInstance();
 $session = \SimpleSAML\Session::getSessionFromRequest();
 $session->setData('negotiate:disable', 'session', false, 86400); //24*60*60=86400
-$t = new \SimpleSAML\XHTML\Template($globalConfig, 'negotiateext:disable.php');
+$t = new \SimpleSAML\XHTML\Template($globalConfig, 'negotiateext:disable.twig');
 $t->data['url'] = \SimpleSAML\Module::getModuleURL('negotiateext/enable.php');
-$t->show();
+$t->send();
