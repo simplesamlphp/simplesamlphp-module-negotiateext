@@ -79,11 +79,9 @@ class NegotiateController
             throw new \SimpleSAML\Error\BadRequest('Missing "AuthState" parameter.');
         }
 
-        /** @psalm-var array $state */
-        $state = Auth\State::loadState($authState, Negotiate::STAGEID);
+        Auth\State::loadState($authState, Negotiate::STAGEID);
 
-        $url = str_replace('/auth', '/backend', $_SERVER['REDIRECT_URL']) . '?' . $_SERVER['REDIRECT_QUERY_STRING'];
-
+        $url = str_replace('/auth', '/backend', $url . '?' . $query;
         return new RedirectResponse($url);
     }
 
