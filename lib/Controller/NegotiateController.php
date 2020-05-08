@@ -93,16 +93,20 @@ class NegotiateController
      */
     public function enable(): Template
     {
-        $params = [
-            'secure' => false,
-            'httponly' => true,
-        ];
-
-        Utils\HTTP::setCookie('NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT', null, $params, false);
-
         $this->session->setData('negotiateext:disable', 'session', false, 86400); // 24*60*60=86400
 
+        $cookie = new \Symfony\Component\HttpFoundation\Cookie(
+            'NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT',
+            'null', // value
+            mktime(0, 0, 0, 1, 1, 2038), // expire
+            '/', // path
+            '', // domain
+            true, // secure
+            true // httponly
+        );
+
         $t = new Template($this->config, 'negotiateext:enable.twig');
+        $t->headers->setCookie($cookie);
         $t->data['url'] = Module::getModuleURL('negotiateext/disable');
 
         return $t;
@@ -116,17 +120,20 @@ class NegotiateController
      */
     public function disable(): Template
     {
-        $params = [
-            'expire' => mktime(0, 0, 0, 1, 1, 2038),
-            'secure' => false,
-            'httponly' => true,
-        ];
-
-        Utils\HTTP::setCookie('NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT', 'True', $params, false);
-
         $this->session->setData('negotiateext:disable', 'session', false, 86400); //24*60*60=86400
 
+        $cookie = new \Symfony\Component\HttpFoundation\Cookie(
+            'NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT',
+            'True', // value
+            mktime(0, 0, 0, 1, 1, 2038), // expire
+            '/', // path
+            '', // domain
+            true, // secure
+            true // httponly
+        );
+
         $t = new Template($this->config, 'negotiateext:disable.twig');
+        $t->headers->setCookie($cookie);
         $t->data['url'] = Module::getModuleURL('negotiateext/enable');
 
         return $t;
