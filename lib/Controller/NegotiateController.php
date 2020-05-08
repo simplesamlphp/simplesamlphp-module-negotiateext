@@ -97,7 +97,7 @@ class NegotiateController
 
         $cookie = new \Symfony\Component\HttpFoundation\Cookie(
             'NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT',
-            'null', // value
+            null, // value
             mktime(0, 0, 0, 1, 1, 2038), // expire
             '/', // path
             '', // domain
@@ -124,7 +124,7 @@ class NegotiateController
 
         $cookie = new \Symfony\Component\HttpFoundation\Cookie(
             'NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT',
-            'True', // value
+            true, // value
             mktime(0, 0, 0, 1, 1, 2038), // expire
             '/', // path
             '', // domain
