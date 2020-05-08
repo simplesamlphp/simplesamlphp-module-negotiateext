@@ -54,7 +54,7 @@ client.
 
 All configuration is handled in authsources.php:
 
-     'weblogin' => array(
+     'weblogin' => [
              'negotiateext:Negotiate',
              'fallback' => 'ldap',
              'hostname' => 'ldap.example.com',
@@ -62,15 +62,15 @@ All configuration is handled in authsources.php:
              'base' => 'cn=people,dc=example,dc=com',
              'adminUser' => 'cn=idp-fallback,cn=services,dc=example,dc=com',
              'adminPassword' => 'VerySecretPassphraseHush'
-     ),
-     'ldap' => array(
+     ],
+     'ldap' => [
              'ldap:LDAP',
              'hostname' => 'ldap.example.com',
              'enable_tls' => TRUE,
              'timeout' => 10,
              'dnpattern' => 'uid=%username%,cn=people,dc=example,dc=com',
              'search.enable' => FALSE
-     ),
+     ],
 
 
 
@@ -84,7 +84,7 @@ by the web server. For Apache httpd, you can freely use `mod_auth_kerb` or
 You **must** configure protection on the `auth.php` script properly as
 follows: (Example for `mod_auth_kerb`)
 
-    <LocationMatch /negotiateext/auth.php>
+    <LocationMatch /negotiateext/auth>
         AuthType KerberosV5
         KrbMethodK5Passwd off
         KrbMethodK4Passwd off
@@ -92,7 +92,7 @@ follows: (Example for `mod_auth_kerb`)
         Krb5Keytab /etc/httpd.keytab
         AuthName "Kerberos SSO"
         Require valid-user
-        ErrorDocument 401 /module.php/negotiateext/error.php
+        ErrorDocument 401 /module.php/negotiateext/error
     </LocationMatch>
 
 Note that you need to adjust the path to the ErrorDocument according
@@ -126,7 +126,7 @@ WWW-Authenticate request.
 
 Syntax is:
 
-     'subnet' => array('127.0.0.0/16','192.168.0.0/16'),
+     'subnet' => ['127.0.0.0/16','192.168.0.0/16'],
 
 Browsers, especially IE, behave erratically when they encounter a
 WWW-Authenticate from the webserver. Included in RFC4559 Negotiate is
@@ -208,7 +208,7 @@ module:
          echo '<span id="login-extra-info-uio.no" class="login-extra-info">'
               . '<span class="login-extra-info-divider"></span>'
               . $this->t('{negotiate:negotiate:failed_info}')
-              . ' <a class="btn" href="'.SimpleSAML_Module::getModuleURL('negotiateext/retry.php', array('AuthState' => $this->data['nego']['retry_id'])).'">'
+              . ' <a class="btn" href="'.SimpleSAML_Module::getModuleURL('negotiateext/retry', array('AuthState' => $this->data['nego']['retry_id'])).'">'
               . $this->t('{negotiate:negotiate:retry_link}')
               . '</a>'
               . '</span>';
