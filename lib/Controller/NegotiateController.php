@@ -81,7 +81,7 @@ class NegotiateController
 
         Auth\State::loadState($authState, Negotiate::STAGEID);
 
-        $url = str_replace('/auth', '/backend', $url . '?' . $query;
+        $url = str_replace('/auth', '/backend', $url . '?' . $query);
         return new RedirectResponse($url);
     }
 
