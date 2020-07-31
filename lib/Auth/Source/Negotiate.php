@@ -62,6 +62,9 @@ class Negotiate extends \SimpleSAML\Auth\Source
     /** @var array|null */
     protected $attributes = null;
 
+    /** @var array */
+    protected $binaryAttributes = [];
+
 
     /**
      * Constructor for this authentication source.
@@ -89,6 +92,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
         $this->admin_user = $cfg->getString('adminUser', null);
         $this->admin_pw = $cfg->getString('adminPassword', null);
         $this->attributes = $cfg->getArray('attributes', null);
+        $this->binaryAttributes = $cfg->getArray('attributes.binary', []);
     }
 
 
@@ -363,7 +367,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
         try {
             /** @psalm-var string $dn */
             $dn = $this->ldap->searchfordn($this->base, $this->attr, $uid);
-            return $this->ldap->getAttributes($dn, $this->attributes);
+            return $this->ldap->getAttributes($dn, $this->attributes, $this->binaryAttributes);
         } catch (\SimpleSAML\Error\Exception $e) {
             Logger::debug('Negotiate - ldap lookup failed: ' . $e);
             return null;
