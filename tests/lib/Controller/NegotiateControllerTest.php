@@ -196,7 +196,7 @@ class NegotiateTest extends TestCase
             }
         }
 
-        $this->assertEquals($cookie->getValue(), true);
+        $this->assertEquals($cookie->getValue(), 'true');
         $this->assertEquals($cookie->getDomain(), null);
         $this->assertEquals($cookie->getPath(), '/');
         $this->assertEquals($expiration = $cookie->getExpiresTime(), mktime(0, 0, 0, 1, 1, 2038));
