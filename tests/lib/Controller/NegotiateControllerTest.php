@@ -29,7 +29,6 @@ class NegotiateTest extends TestCase
 
     /**
      * Set up for each test.
-     * @return void
      */
     protected function setUp(): void
     {
@@ -51,7 +50,6 @@ class NegotiateTest extends TestCase
 
     /**
      * Test that a valid requests results in a RunnableResponse
-     * @return void
      */
     public function testAuth(): void
     {
@@ -71,7 +69,6 @@ class NegotiateTest extends TestCase
 
     /**
      * Test that a valid requests results in a RedirectResponse
-     * @return void
     public function testError(): void
     {
         $request = Request::create(
@@ -91,7 +88,6 @@ class NegotiateTest extends TestCase
 
     /**
      * Test that a missing AuthState results in a BadRequest-error
-     * @return void
      */
     public function testErrorMissingState(): void
     {
@@ -111,7 +107,6 @@ class NegotiateTest extends TestCase
 
     /**
      * Test that an invalid AuthState results in a NOSTATE-error
-     * @return void
      */
     public function testErrorInvalidState(): void
     {
@@ -132,7 +127,6 @@ class NegotiateTest extends TestCase
 
     /**
      * Test that a valid requests results in a Twig template
-     * @return void
      */
     public function testEnable(): void
     {
@@ -170,7 +164,6 @@ class NegotiateTest extends TestCase
 
     /**
      * Test that a valid requests results in a Twig template
-     * @return void
      */
     public function testDisable(): void
     {
@@ -208,7 +201,6 @@ class NegotiateTest extends TestCase
 
     /**
      * Test that a valid requests results in a RunnableResponse
-     * @return void
     public function testRetry(): void
     {
         $request = Request::create(
@@ -230,7 +222,6 @@ class NegotiateTest extends TestCase
 
     /**
      * Test that a missing AuthState results in a BadRequest-error
-     * @return void
      */
     public function testRetryMissingState(): void
     {
@@ -250,7 +241,6 @@ class NegotiateTest extends TestCase
 
     /**
      * Test that an invalid AuthState results in a NOSTATE-error
-     * @return void
      */
     public function testRetryInvalidState(): void
     {
@@ -271,7 +261,6 @@ class NegotiateTest extends TestCase
 
     /**
      * Test that a valid requests results in a RunnableResponse
-     * @return void
     public function testBackend(): void
     {
         $request = Request::create(
@@ -292,7 +281,6 @@ class NegotiateTest extends TestCase
 
     /**
      * Test that a missing AuthState results in a BadRequest-error
-     * @return void
      */
     public function testBackendMissingState(): void
     {
@@ -312,7 +300,6 @@ class NegotiateTest extends TestCase
 
     /**
      * Test that an invalid AuthState results in a NOSTATE-error
-     * @return void
      */
     public function testBackendInvalidState(): void
     {
