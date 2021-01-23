@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\negotiateext\Auth\Source;
 
+use SimpleSAML\Assert\Assert;
 use SimpleSAML\Logger;
-use Webmozart\Assert\Assert;
+use SimpleSAML\Module\ldap\Auth\Ldap;
 
 /**
  * The Negotiate module. Allows for password-less, secure login by Kerberos and Negotiate.
@@ -17,52 +20,52 @@ class Negotiate extends \SimpleSAML\Auth\Source
     public const STAGEID = '\SimpleSAML\Module\negotiateext\Auth\Source\Negotiate.StageId';
 
     /** @var \SimpleSAML\Module\ldap\Auth\Ldap */
-    protected $ldap;
+    protected Ldap $ldap;
 
     /** @var string */
-    protected $backend = '';
-
-    /** @var string*/
-    protected $hostname = '';
-
-    /** @var int */
-    protected $port = 389;
-
-    /** @var bool */
-    protected $referrals = true;
-
-    /** @var bool */
-    protected $enableTLS = false;
-
-    /** @var bool */
-    protected $debugLDAP = false;
-
-    /** @var int */
-    protected $timeout = 30;
+    protected string $backend = '';
 
     /** @var string */
-    protected $keytab = '';
+    protected string $hostname = '';
+
+    /** @var int */
+    protected int $port = 389;
+
+    /** @var bool */
+    protected bool $referrals = true;
+
+    /** @var bool */
+    protected bool $enableTLS = false;
+
+    /** @var bool */
+    protected bool $debugLDAP = false;
+
+    /** @var int */
+    protected int $timeout = 30;
+
+    /** @var string */
+    protected string $keytab = '';
 
     /** @var array */
-    protected $base = [];
+    protected array $base = [];
 
     /** @var array */
-    protected $attr = ['uid'];
+    protected array $attr = ['uid'];
 
     /** @var array|null */
-    protected $subnet = null;
+    protected ?array $subnet = null;
 
     /** @var string|null */
-    protected $admin_user = null;
+    protected ?string $admin_user = null;
 
     /** @var string|null */
-    protected $admin_pw = null;
+    protected ?string $admin_pw = null;
 
     /** @var array|null */
-    protected $attributes = null;
+    protected ?array $attributes = null;
 
     /** @var array */
-    protected $binaryAttributes = [];
+    protected array $binaryAttributes = [];
 
 
     /**

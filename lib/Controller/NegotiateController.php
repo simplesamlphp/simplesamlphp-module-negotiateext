@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\negotiateext\Controller;
 
 use Exception;
@@ -27,10 +29,10 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class NegotiateController
 {
     /** @var \SimpleSAML\Configuration */
-    protected $config;
+    protected Configuration $config;
 
     /** @var \SimpleSAML\Session */
-    protected $session;
+    protected Session $session;
 
 
     /**
