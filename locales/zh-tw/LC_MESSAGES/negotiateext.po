@@ -15,7 +15,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.5.1\n"
 
-msgid "{negotiateext:disable_title}"
+msgid "Turned off ability to use automatic login for this browser"
 msgstr "嘗試於瀏覽器關閉自動登入功能"
 
 msgid "{negotiateext:disable_info_pre}"
