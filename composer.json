@@ -1,5 +1,5 @@
 {
-    "name": "simplesamlphp/simplesamlphp-module-negotiate-ext",
+    "name": "simplesamlphp/simplesamlphp-module-negotiateext",
     "description": "This module implements Microsofts Kerberos SPNEGO mechanism nu leveraging Apache modules",
     "type": "simplesamlphp-module",
     "keywords": ["simplesamlphp", "negotiate-ext"],
@@ -41,7 +41,7 @@
         "simplesamlphp/simplesamlphp-test-framework": "~1.0.3"
     },
     "support": {
-        "issues": "https://github.com/tvdijen/simplesamlphp-module-negotiate-ext/issues",
-        "source": "https://github.com/tvdijen/simplesamlphp-module-negotiate-ext"
+        "issues": "https://github.com/tvdijen/simplesamlphp-module-negotiateext/issues",
+        "source": "https://github.com/tvdijen/simplesamlphp-module-negotiateext"
     }
 }
