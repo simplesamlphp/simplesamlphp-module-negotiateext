@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Module\negotiateext\Auth\Source;
 
+use Exception;
 use SimpleSAML\Assert\Assert;
+use SimpleSAML\Auth;
+use SimpleSAML\Error;
 use SimpleSAML\Logger;
+use SimpleSAML\Module;
 use SimpleSAML\Module\ldap\Auth\Ldap;
+use SimpleSAML\Session;
+use SimpleSAML\Utils;
 
 /**
  * The Negotiate module. Allows for password-less, secure login by Kerberos and Negotiate.
  *
- * @package SimpleSAMLphp
+ * @package simplesamlphp/simplesamlphp-module-negotiate
  */
 
 class Negotiate extends \SimpleSAML\Auth\Source
@@ -193,8 +199,9 @@ class Negotiate extends \SimpleSAML\Auth\Source
             return true;
         }
         $ip = $_SERVER['REMOTE_ADDR'];
+        $netUtils = new Utils\Net();
         foreach ($this->subnet as $cidr) {
-            $ret = \SimpleSAML\Utils\Net::ipCIDRcheck($cidr);
+            $ret = $netUtils->ipCIDRcheck($cidr);
             if ($ret) {
                 Logger::debug('Negotiate: Client "' . $ip . '" matched subnet.');
                 return true;
@@ -213,8 +220,9 @@ class Negotiate extends \SimpleSAML\Auth\Source
      */
     protected function sendNegotiate(array $params): void
     {
-        $authPage = \SimpleSAML\Module::getModuleURL('negotiateext/auth.php');
-        \SimpleSAML\Utils\HTTP::redirectTrustedURL($authPage, $params);
+        $authPage = Module::getModuleURL('negotiateext/auth.php');
+        $httpUtils = new Utils\HTTP();
+        $httpUtils->redirectTrustedURL($authPage, $params);
     }
 
 
@@ -232,22 +240,22 @@ class Negotiate extends \SimpleSAML\Auth\Source
         $authId = $state['LogoutState']['negotiate:backend'];
 
         if ($authId === null) {
-            throw new \SimpleSAML\Error\Error([500, "Unable to determine auth source."]);
+            throw new Error\Error([500, "Unable to determine auth source."]);
         }
         Logger::debug('Negotiate: fallBack to ' . $authId);
-        $source = \SimpleSAML\Auth\Source::getById($authId);
+        $source = Auth\Source::getById($authId);
 
         if ($source === null) {
-            throw new \Exception('Could not find authentication source with id ' . $authId);
+            throw new Exception('Could not find authentication source with id ' . $authId);
         }
 
         try {
             $source->authenticate($state);
-        } catch (\SimpleSAML\Error\Exception $e) {
-            \SimpleSAML\Auth\State::throwException($state, $e);
-        } catch (\Exception $e) {
-            $e = new \SimpleSAML\Error\UnserializableException($e);
-            \SimpleSAML\Auth\State::throwException($state, $e);
+        } catch (Error\Exception $e) {
+            Auth\State::throwException($state, $e);
+        } catch (Exception $e) {
+            $e = new Error\UnserializableException($e);
+            Auth\State::throwException($state, $e);
         }
         // fallBack never returns after loginCompleted()
         Logger::debug('Negotiate: backend returned');
@@ -261,7 +269,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
     public function externalAuth(array &$state): void
     {
         Logger::debug('Negotiate - authenticate(): remote user found');
-        $this->ldap = new \SimpleSAML\Module\ldap\Auth\Ldap(
+        $this->ldap = new Ldap(
             $this->hostname,
             $this->enableTLS,
             $this->debugLDAP,
@@ -280,7 +288,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
                 'negotiate:backend' => null,
             ];
             Logger::info('Negotiate - authenticate(): ' . $user . ' authorized.');
-            \SimpleSAML\Auth\Source::completeAuth($state);
+            Auth\Source::completeAuth($state);
             // Never reached.
             assert(false);
         }
@@ -299,30 +307,31 @@ class Negotiate extends \SimpleSAML\Auth\Source
     public static function external(): void
     {
         if (!isset($_REQUEST['AuthState'])) {
-            throw new \SimpleSAML\Error\BadRequest('Missing "AuthState" parameter.');
+            throw new Error\BadRequest('Missing "AuthState" parameter.');
         }
         Logger::debug('Negotiate: external returned');
-        $sid = \SimpleSAML\Auth\State::parseStateID($_REQUEST['AuthState']);
+        $sid = Auth\State::parseStateID($_REQUEST['AuthState']);
 
-        $state = \SimpleSAML\Auth\State::loadState($_REQUEST['AuthState'], self::STAGEID, true);
+        $state = Auth\State::loadState($_REQUEST['AuthState'], self::STAGEID, true);
         if ($state === null) {
             if ($sid['url'] === null) {
-                throw new \SimpleSAML\Error\NoState();
+                throw new Error\NoState();
             }
-            \SimpleSAML\Utils\HTTP::redirectUntrustedURL($sid['url'], ['negotiateext.auth' => 'false']);
+            $httpUtils = new Utils\HTTP();
+            $httpUtils->redirectUntrustedURL($sid['url'], ['negotiateext.auth' => 'false']);
             assert(false);
         }
 
         Assert::isArray($state);
 
         if (!empty($_SERVER['REMOTE_USER'])) {
-            $source = \SimpleSAML\Auth\Source::getById($state['negotiate:authId']);
+            $source = Auth\Source::getById($state['negotiate:authId']);
             if ($source === null) {
                 /*
                  * The only way this should fail is if we remove or rename the authentication source
                  * while the user is at the login page.
                  */
-                throw new \SimpleSAML\Error\Exception(
+                throw new Error\Exception(
                     'Could not find authentication source with id ' . $state['negotiate:authId']
                 );
             }
@@ -332,7 +341,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
              * change config/authsources.php while an user is logging in.
              */
             if (!($source instanceof self)) {
-                throw new \SimpleSAML\Error\Exception('Authentication source type changed.');
+                throw new Error\Exception('Authentication source type changed.');
             }
             Logger::debug('Negotiate - authenticate(): looking for Negotate');
             $source->externalAuth($state);
@@ -365,7 +374,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
             /** @psalm-var string $dn */
             $dn = $this->ldap->searchfordn($this->base, $this->attr, $uid);
             return $this->ldap->getAttributes($dn, $this->attributes, $this->binaryAttributes);
-        } catch (\SimpleSAML\Error\Exception $e) {
+        } catch (Error\Exception $e) {
             Logger::debug('Negotiate - ldap lookup failed: ' . $e);
             return null;
         }
@@ -389,7 +398,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
         if (!$this->ldap->bind($this->admin_user, $this->admin_pw)) {
             $msg = 'Unable to authenticate system user (LDAP_INVALID_CREDENTIALS)';
             Logger::error('Negotiate - authenticate(): ' . $msg . ' ' . var_export($this->admin_user, true));
-            throw new \SimpleSAML\Error\AuthSource('negotiate', $msg);
+            throw new Error\AuthSource('negotiate', $msg);
         }
     }
 
@@ -409,11 +418,11 @@ class Negotiate extends \SimpleSAML\Auth\Source
         Logger::debug('Negotiate - logout has the following authId: "' . $authId . '"');
 
         if ($authId === null) {
-            $session = \SimpleSAML\Session::getSessionFromRequest();
+            $session = Session::getSessionFromRequest();
             $session->setData('negotiate:disable', 'session', true, 0);
             parent::logout($state);
         } else {
-            $source = \SimpleSAML\Auth\Source::getById($authId);
+            $source = Auth\Source::getById($authId);
             if ($source === null) {
                 throw new \Exception('Could not find authentication source with id ' . $authId);
             }
