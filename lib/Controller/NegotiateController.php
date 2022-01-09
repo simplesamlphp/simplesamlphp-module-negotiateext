@@ -15,6 +15,7 @@ use SimpleSAML\Module;
 use SimpleSAML\Module\negotiateext\Auth\Source\Negotiate;
 use SimpleSAML\Session;
 use SimpleSAML\XHTML\Template;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -75,9 +76,9 @@ class NegotiateController
         $query = $request->server->get('REDIRECT_QUERY_STRING');
         $url = $request->server->get('REDIRECT_URL');
 
-        $authState = $request->get('AuthState', null);
+        $authState = $request->query->get('AuthState', null);
         if ($authState === null) {
-            throw new \SimpleSAML\Error\BadRequest('Missing "AuthState" parameter.');
+            throw new Error\BadRequest('Missing "AuthState" parameter.');
         }
 
         Auth\State::loadState($authState, Negotiate::STAGEID);
@@ -96,7 +97,7 @@ class NegotiateController
     {
         $this->session->setData('negotiateext:disable', 'session', false, 86400); // 24*60*60=86400
 
-        $cookie = new \Symfony\Component\HttpFoundation\Cookie(
+        $cookie = new Cookie(
             'NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT',
             null, // value
             mktime(0, 0, 0, 1, 1, 2038), // expire
@@ -123,7 +124,7 @@ class NegotiateController
     {
         $this->session->setData('negotiateext:disable', 'session', false, 86400); //24*60*60=86400
 
-        $cookie = new \Symfony\Component\HttpFoundation\Cookie(
+        $cookie = new Cookie(
             'NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT',
             'true', // value
             mktime(0, 0, 0, 1, 1, 2038), // expire
@@ -149,7 +150,7 @@ class NegotiateController
      */
     public function retry(Request $request): RunnableResponse
     {
-        $authState = $request->get('AuthState', null);
+        $authState = $request->query->get('AuthState', null);
         if ($authState === null) {
             throw new Error\BadRequest('Missing required AuthState query parameter.');
         }
@@ -184,7 +185,7 @@ class NegotiateController
      */
     public function fallback(Request $request): RunnableResponse
     {
-        $authState = $request->get('AuthState', null);
+        $authState = $request->query->get('AuthState', null);
         if ($authState === null) {
             throw new Error\BadRequest('Missing required AuthState query parameter.');
         }
