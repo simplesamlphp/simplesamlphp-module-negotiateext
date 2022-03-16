@@ -89,18 +89,18 @@ class Negotiate extends \SimpleSAML\Auth\Source
 
         $this->backend = $cfg->getString('fallback');
         $this->hostname = $cfg->getString('hostname');
-        $this->port = $cfg->getInteger('port', 389);
-        $this->referrals = $cfg->getBoolean('referrals', true);
-        $this->enableTLS = $cfg->getBoolean('enable_tls', false);
-        $this->debugLDAP = $cfg->getBoolean('debugLDAP', false);
-        $this->timeout = $cfg->getInteger('timeout', 30);
+        $this->port = $cfg->getOptionalInteger('port', 389);
+        $this->referrals = $cfg->getOptionalBoolean('referrals', true);
+        $this->enableTLS = $cfg->getOptionalBoolean('enable_tls', false);
+        $this->debugLDAP = $cfg->getOptionalBoolean('debugLDAP', false);
+        $this->timeout = $cfg->getOptionalInteger('timeout', 30);
         $this->base = $cfg->getArrayizeString('base');
-        $this->attr = $cfg->getArrayizeString('attr', 'uid');
-        $this->subnet = $cfg->getArray('subnet', null);
-        $this->admin_user = $cfg->getString('adminUser', null);
-        $this->admin_pw = $cfg->getString('adminPassword', null);
-        $this->attributes = $cfg->getArray('attributes', null);
-        $this->binaryAttributes = $cfg->getArray('attributes.binary', []);
+        $this->attr = $cfg->getOptionalArrayizeString('attr', 'uid');
+        $this->subnet = $cfg->getOptionalArray('subnet', null);
+        $this->admin_user = $cfg->getOptionalString('adminUser', null);
+        $this->admin_pw = $cfg->getOptionalString('adminPassword', null);
+        $this->attributes = $cfg->getOptionalArray('attributes', null);
+        $this->binaryAttributes = $cfg->getOptionalArray('attributes.binary', []);
     }
 
 
@@ -130,7 +130,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
         }
         /* Go straight to fallback if Negotiate is disabled or if you are sent back to the IdP directly from the SP
         after having logged out. */
-        $session = \SimpleSAML\Session::getSessionFromRequest();
+        $session = Session::getSessionFromRequest();
         $disabled = $session->getData('negotiate:disable', 'session');
 
         if (
@@ -156,7 +156,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
         Logger::debug('Negotiate - authenticate(): Sending Negotiate.');
         // Save the $state array, so that we can restore if after a redirect
         Logger::debug('Negotiate - fallback: ' . $state['LogoutState']['negotiate:backend']);
-        $id = \SimpleSAML\Auth\State::saveState($state, self::STAGEID);
+        $id = Auth\State::saveState($state, self::STAGEID);
         $params = ['AuthState' => $id];
 
         $this->sendNegotiate($params);
@@ -424,7 +424,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
         } else {
             $source = Auth\Source::getById($authId);
             if ($source === null) {
-                throw new \Exception('Could not find authentication source with id ' . $authId);
+                throw new Exception('Could not find authentication source with id ' . $authId);
             }
 
             $source->logout($state);
