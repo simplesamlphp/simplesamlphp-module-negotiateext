@@ -14,13 +14,13 @@ negotiateext:Negotiate
 
 Negotiate implements the following mechanics:
 
- * Initiate HTTP_AUTHN with the client
- * Authorize user against a LDAP directory
- * Collect metadata from LDAP directory
- * Fall back to other SimpleSamlPhp module for any client/user that
-   fails to authenticate in the Negotiate-Ext module
- * Check only clients from a certain subnet
- * Supports enabling/disabling a client
+* Initiate HTTP_AUTHN with the client
+* Authorize user against a LDAP directory
+* Collect metadata from LDAP directory
+* Fall back to other SimpleSamlPhp module for any client/user that
+  fails to authenticate in the Negotiate-Ext module
+* Check only clients from a certain subnet
+* Supports enabling/disabling a client
 
 In effect this module aims to extend the Microsoft AD or FreeIPA
 Kerberos SSO session to the SAML IdP. It doesn't work like this
@@ -81,7 +81,7 @@ All configuration is handled in authsources.php:
 
 The processing involving the actual Authentication handling is done
 by the web server. For Apache httpd, you can freely use `mod_auth_kerb` or
-`mod_auth_gssapi`. 
+`mod_auth_gssapi`.
 
 You **must** configure protection on the `auth.php` script properly as
 follows: (Example for `mod_auth_kerb`)
@@ -127,9 +127,8 @@ conditions. This triggers a popup login box which defeats the whole
 purpose of this module.
 
 TBD: Replace or supplement with LDAP lookups in the domain. Machines
-currently in the domain should be the only ones that are promted with
+currently in the domain should be the only ones that are prompted with
 WWW-Authenticate: Negotiate.
-
 
 ## Enabling/disabling Negotiate from a web browser
 
@@ -138,7 +137,6 @@ disabling Negotiate for any given client. The pages simple set/deletes
 a cookie that Negotiate will look for when a client attempts AuthN.
 The help text in the JSON files should be locally overwritten to fully
 explain which clients are accepted by Negotiate.
-
 
 ## Logout/Login loop and reauthenticating
 
@@ -253,6 +251,10 @@ TODO
 Chrome on Linux: Create a file /etc/opt/chrome/policies/managed/company_policy.json
 with the following content:
 
-    {"AuthServerWhitelist":"your.idp.host"}
+```json
+{"AuthServerWhitelist":"your.idp.host"}
+```
 
-Chrome on OSX: Configure AuthServerWhitelist using Apple Workgroup Manager as detailed on https://www.chromium.org/administrators/mac-quick-start 
+Chrome on OSX: Configure AuthServerWhitelist using [Apple Workgroup Manager][1]
+
+[1]: https://www.chromium.org/administrators/mac-quick-start
