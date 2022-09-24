@@ -10,7 +10,6 @@ use SimpleSAML\Auth;
 use SimpleSAML\Error;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
-use SimpleSAML\Module\ldap\Auth\Ldap;
 use SimpleSAML\Session;
 use SimpleSAML\Utils;
 
@@ -25,53 +24,17 @@ class Negotiate extends \SimpleSAML\Auth\Source
     // Constants used in the module
     public const STAGEID = '\SimpleSAML\Module\negotiateext\Auth\Source\Negotiate.StageId';
 
-    /** @var \SimpleSAML\Module\ldap\Auth\Ldap */
-    protected Ldap $ldap;
+    /** @var string */
+    protected string $backend;
 
     /** @var string */
-    protected string $backend = '';
-
-    /** @var string */
-    protected string $hostname = '';
-
-    /** @var int */
-    protected int $port = 389;
-
-    /** @var bool */
-    protected bool $referrals = true;
-
-    /** @var bool */
-    protected bool $enableTLS = false;
-
-    /** @var bool */
-    protected bool $debugLDAP = false;
-
-    /** @var int */
-    protected int $timeout = 30;
+    protected string $fallback;
 
     /** @var string */
     protected string $keytab = '';
 
-    /** @var array */
-    protected array $base = [];
-
-    /** @var array */
-    protected array $attr = ['uid'];
-
     /** @var array|null */
     protected ?array $subnet = null;
-
-    /** @var string|null */
-    protected ?string $admin_user = null;
-
-    /** @var string|null */
-    protected ?string $admin_pw = null;
-
-    /** @var array|null */
-    protected ?array $attributes = null;
-
-    /** @var array */
-    protected array $binaryAttributes = [];
 
 
     /**
@@ -87,20 +50,9 @@ class Negotiate extends \SimpleSAML\Auth\Source
 
         $cfg = \SimpleSAML\Configuration::loadFromArray($config);
 
-        $this->backend = $cfg->getString('fallback');
-        $this->hostname = $cfg->getString('hostname');
-        $this->port = $cfg->getOptionalInteger('port', 389);
-        $this->referrals = $cfg->getOptionalBoolean('referrals', true);
-        $this->enableTLS = $cfg->getOptionalBoolean('enable_tls', false);
-        $this->debugLDAP = $cfg->getOptionalBoolean('debugLDAP', false);
-        $this->timeout = $cfg->getOptionalInteger('timeout', 30);
-        $this->base = $cfg->getArrayizeString('base');
-        $this->attr = $cfg->getOptionalArrayizeString('attr', 'uid');
+        $this->backend = $cfg->getString('backend');
+        $this->fallback = $cfg->getString('fallback');
         $this->subnet = $cfg->getOptionalArray('subnet', null);
-        $this->admin_user = $cfg->getOptionalString('adminUser', null);
-        $this->admin_pw = $cfg->getOptionalString('adminPassword', null);
-        $this->attributes = $cfg->getOptionalArray('attributes', null);
-        $this->binaryAttributes = $cfg->getOptionalArray('attributes.binary', []);
     }
 
 
@@ -122,6 +74,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
             'negotiate:backend' => $this->backend,
         ];
         $state['negotiate:authId'] = $this->authId;
+        $state['negotiate:fallback'] = $this->fallback;
 
 
         // check for disabled SPs. The disable flag is store in the SP metadata
@@ -136,15 +89,16 @@ class Negotiate extends \SimpleSAML\Auth\Source
         if (
             $disabled ||
             (!empty($_REQUEST['negotiateext_auth']) &&
-                $_REQUEST['negotiateext_auth'] == 'false') ||
+                $_REQUEST['negotiateext_auth'] === 'false') ||
             (!empty($_COOKIE['NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT']) &&
-                $_COOKIE['NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT'] == 'True')
+                $_COOKIE['NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT'] === 'true')
         ) {
             Logger::debug('Negotiate - session disabled. falling back');
             $this->fallBack($state);
             // never executed
             assert(false);
         }
+
         $mask = $this->checkMask();
         if (!$mask) {
             $this->fallBack($state);
@@ -171,7 +125,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
     public function spDisabledInMetadata(array $spMetadata): bool
     {
         if (array_key_exists('negotiate:disable', $spMetadata)) {
-            if ($spMetadata['negotiate:disable'] == true) {
+            if ($spMetadata['negotiate:disable'] === true) {
                 Logger::debug('Negotiate - SP disabled. falling back');
                 return true;
             } else {
@@ -235,9 +189,9 @@ class Negotiate extends \SimpleSAML\Auth\Source
      * @throws \SimpleSAML\Error\Exception
      * @throws \Exception
      */
-    public static function fallBack(array &$state): void
+    public static function fallBack(array &$state): void // never
     {
-        $authId = $state['LogoutState']['negotiate:backend'];
+        $authId = $state['negotiate:fallback'];
 
         if ($authId === null) {
             throw new Error\Error([500, "Unable to determine auth source."]);
@@ -257,6 +211,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
             $e = new Error\UnserializableException($e);
             Auth\State::throwException($state, $e);
         }
+
         // fallBack never returns after loginCompleted()
         Logger::debug('Negotiate: backend returned');
         self::loginCompleted($state);
@@ -269,14 +224,6 @@ class Negotiate extends \SimpleSAML\Auth\Source
     public function externalAuth(array &$state): void
     {
         Logger::debug('Negotiate - authenticate(): remote user found');
-        $this->ldap = new Ldap(
-            $this->hostname,
-            $this->enableTLS,
-            $this->debugLDAP,
-            $this->timeout,
-            $this->port,
-            $this->referrals
-        );
 
         $user = $_SERVER['REMOTE_USER'];
         Logger::info('Negotiate - authenticate(): ' . $user . ' authenticated.');
@@ -369,36 +316,17 @@ class Negotiate extends \SimpleSAML\Auth\Source
         }
         $uid = substr($user, 0, $pos);
 
-        $this->adminBind();
+        /** @var \SimpleSAML\Module\ldap\Auth\Source\Ldap|null $source */
+        $source = Auth\Source::getById($this->backend);
+        if ($source === null) {
+            throw new Exception('Could not find authentication source with id ' . $this->backend);
+        }
+
         try {
-            /** @psalm-var string $dn */
-            $dn = $this->ldap->searchfordn($this->base, $this->attr, $uid);
-            return $this->ldap->getAttributes($dn, $this->attributes, $this->binaryAttributes);
+            return $source->getAttributes($uid);
         } catch (Error\Exception $e) {
             Logger::debug('Negotiate - ldap lookup failed: ' . $e);
             return null;
-        }
-    }
-
-
-    /**
-     * Elevates the LDAP connection to allow restricted lookups if
-     * so configured. Does nothing if not.
-     *
-     * @throws \SimpleSAML\Error\AuthSource
-     */
-    protected function adminBind(): void
-    {
-        if ($this->admin_user === null || $this->admin_pw === null) {
-            // no admin user
-            return;
-        }
-        Logger::debug('Negotiate - authenticate(): Binding as system user ' . var_export($this->admin_user, true));
-
-        if (!$this->ldap->bind($this->admin_user, $this->admin_pw)) {
-            $msg = 'Unable to authenticate system user (LDAP_INVALID_CREDENTIALS)';
-            Logger::error('Negotiate - authenticate(): ' . $msg . ' ' . var_export($this->admin_user, true));
-            throw new Error\AuthSource('negotiate', $msg);
         }
     }
 
@@ -414,7 +342,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
     public function logout(array &$state): void
     {
         // get the source that was used to authenticate
-        $authId = $state['negotiate:backend'];
+        $authId = $state['LogoutState']['negotiate:backend'];
         Logger::debug('Negotiate - logout has the following authId: "' . $authId . '"');
 
         if ($authId === null) {

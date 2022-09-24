@@ -1,5 +1,4 @@
-Negotiate-Ext module
-====================
+# Negotiate-Ext module
 
 The Negotiate-Ext module implements external authentication mechanism.
 It is intended to support Kerberos SPNEGO or other GSSAPI by
@@ -11,8 +10,7 @@ It is based on the Negotiate module but does not require php-krb5.
 negotiateext:Negotiate
 :     Authenticates users via HTTP authentication
 
-negotiateext:Negotiate
-----------------------
+## negotiateext:Negotiate
 
 Negotiate implements the following mechanics:
 
@@ -54,28 +52,32 @@ client.
 
 All configuration is handled in authsources.php:
 
-     'weblogin' => [
-             'negotiateext:Negotiate',
-             'fallback' => 'ldap',
-             'hostname' => 'ldap.example.com',
-             'enable_tls' => TRUE,
-             'base' => 'cn=people,dc=example,dc=com',
-             'adminUser' => 'cn=idp-fallback,cn=services,dc=example,dc=com',
-             'adminPassword' => 'VerySecretPassphraseHush'
-     ],
-     'ldap' => [
-             'ldap:LDAP',
-             'hostname' => 'ldap.example.com',
-             'enable_tls' => TRUE,
-             'timeout' => 10,
-             'dnpattern' => 'uid=%username%,cn=people,dc=example,dc=com',
-             'search.enable' => FALSE
-     ],
+```php
+'weblogin' => [
+    'negotiateext:Negotiate',
+    'backend' => 'ldap',
+    'fallback' => 'crypto-hash',
+    'spn' => null,
+],
+'ldap' => [
+    'ldap:LDAP',
+    'hostname' => 'ldap.example.com',
+    'enable_tls' => true,
+    'timeout' => 10,
+    'dnpattern' => 'uid=%username%,cn=people,dc=example,dc=com',
+    'search.enable' => false,
+],
+'crypto-hash' => [
+    'authcrypt:Hash',
+    // hashed version of 'verysecret', made with bin/pwgen.php
+    'professor:{SSHA256}P6FDTEEIY2EnER9a6P2GwHhI5JDrwBgjQ913oVQjBngmCtrNBUMowA==' => [
+        'uid' => ['prof_a'],
+        'eduPersonAffiliation' => ['member', 'employee', 'board'],
+    ],
+]
+```
 
-
-
-Authentication handling
------------------------
+## Authentication handling
 
 The processing involving the actual Authentication handling is done
 by the web server. For Apache httpd, you can freely use `mod_auth_kerb` or
@@ -84,49 +86,39 @@ by the web server. For Apache httpd, you can freely use `mod_auth_kerb` or
 You **must** configure protection on the `auth.php` script properly as
 follows: (Example for `mod_auth_kerb`)
 
-    <LocationMatch /negotiateext/auth>
-        AuthType KerberosV5
-        KrbMethodK5Passwd off
-        KrbMethodK4Passwd off
+```apacheconf
+<LocationMatch /negotiateext/auth>
+    AuthType KerberosV5
+    KrbMethodK5Passwd off
+    KrbMethodK4Passwd off
 
-        Krb5Keytab /etc/httpd.keytab
-        AuthName "Kerberos SSO"
-        Require valid-user
-        ErrorDocument 401 /module.php/negotiateext/error
-    </LocationMatch>
+    Krb5Keytab /etc/httpd.keytab
+    AuthName "Kerberos SSO"
+    Require valid-user
+    ErrorDocument 401 /module.php/negotiateext/error
+</LocationMatch>
+```
 
 Note that you need to adjust the path to the ErrorDocument according
 to the base of your SimpleSAMLphp installation.
 
-LDAP
-----
+## LDAP
 
 LDAP is used to verify the user due to the lack of metadata in
 Kerberos. A domain can contain lots of kiosk users, non-personal
 accounts and the likes. The LDAP lookup will authorize and fetch
 attributes as defined by SimpleSAMLphp metadata.
 
-`hostname`, `enable_tls`, `debugLDAP`, `timeout` and `base` are
-self-explanatory. Read the documentation of the LDAP auth module for
-more information. `attr` is the attribute that will be used to look up
-user objects in the directory after extracting it from the Kerberos
-session. Default is `uid`.
-
-For LDAP directories with restricted access to objects or attributes
-Negotiate implements `adminUser` and `adminPassword`. adminUser must
-be a DN to an object with access to search for all relevant user
-objects and to look up attributes needed by the SP.
-
-
-Subnet filtering
-----------------
+## Subnet filtering
 
 Subnet is meant to filter which clients you subject to the
 WWW-Authenticate request.
 
 Syntax is:
 
-     'subnet' => ['127.0.0.0/16','192.168.0.0/16'],
+```php
+'subnet' => ['127.0.0.0/16','192.168.0.0/16'],
+```
 
 Browsers, especially IE, behave erratically when they encounter a
 WWW-Authenticate from the webserver. Included in RFC4559 Negotiate is
@@ -139,8 +131,7 @@ currently in the domain should be the only ones that are promted with
 WWW-Authenticate: Negotiate.
 
 
-Enabling/disabling Negotiate from a web browser
------------------------------------------------
+## Enabling/disabling Negotiate from a web browser
 
 Included in Negotiate are semi-static web pages for enabling and
 disabling Negotiate for any given client. The pages simple set/deletes
@@ -149,8 +140,7 @@ The help text in the JSON files should be locally overwritten to fully
 explain which clients are accepted by Negotiate.
 
 
-Logout/Login loop and reauthenticating
---------------------------------------
+## Logout/Login loop and reauthenticating
 
 Due to the automatic AuthN of certain clients and how SPs will
 automatically redirect clients to the IdP when clients try to access
@@ -167,54 +157,57 @@ box of information to the user explaining what's happening.
 One can add this bit of code to the template in the fallback AuthN
 module:
 
-    // This should be placed in your www script modules/core/www/loginuserpass.php
+```php
+// This should be placed in your www script modules/core/www/loginuserpass.php
 
-    $nego_perm = FALSE;
-    $nego_retry = NULL;
-    if (is_array($state) && array_key_exists('negotiate:authId', $state)) {
-        $nego = SimpleSAML_Auth_Source::getById($state['negotiate:authId']);
-        $mask = $nego->checkMask();
-        $disabled = $nego->spDisabledInMetadata($spMetadata);
-        $session = SimpleSAML_Session::getSessionFromRequest();
-        $session_disabled = $session && $session->getData('negotiate:disable', 'session');
-        if ($mask and !$disabled) {
-            if(array_key_exists('NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT', $_COOKIE) &&
-               $_COOKIE['NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT'] == 'True') {
-                $nego_perm = TRUE;
-            } else {
-                $retryState = SimpleSAML_Auth_State::cloneState($state);
-                unset($retryState[SimpleSAML_Auth_State::ID]);
-                $nego_retry = SimpleSAML_Auth_State::saveState($retryState, 'sspmod_negotiateext_Auth_Source_Negotiate.StageId');
-                $nego_session = TRUE;
-            }
+$nego_perm = false;
+$nego_retry = null;
+if (is_array($state) && array_key_exists('negotiate:authId', $state)) {
+    $nego = SimpleSAML_Auth_Source::getById($state['negotiate:authId']);
+    $mask = $nego->checkMask();
+    $disabled = $nego->spDisabledInMetadata($spMetadata);
+    $session = SimpleSAML_Session::getSessionFromRequest();
+    $session_disabled = $session && $session->getData('negotiate:disable', 'session');
+    if ($mask && !$disabled) {
+        if (
+            array_key_exists('NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT', $_COOKIE) &&
+            $_COOKIE['NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT'] === 'true'
+        ) {
+            $nego_perm = true;
+        } else {
+            $retryState = SimpleSAML_Auth_State::cloneState($state);
+            unset($retryState[SimpleSAML_Auth_State::ID]);
+            $nego_retry = SimpleSAML_Auth_State::saveState($retryState, 'sspmod_negotiateext_Auth_Source_Negotiate.StageId');
+            $nego_session = true;
         }
     }
-    $t->data['nego'] = array (
-        'disable_perm' => $nego_perm,
-        'retry_id'     => $nego_retry,
-    );
+}
+$t->data['nego'] = [
+    'disable_perm' => $nego_perm,
+    'retry_id'     => $nego_retry,
+];
+```
 
--
+```php
+// This should reside in your template modules/core/templates/loginuserpass.php
 
-    // This should reside in your template modules/core/templates/loginuserpass.php
-
-    <?php
-    if($this->data['nego']['disable_perm']) {
-        echo '<span id="login-extra-info-uio.no" class="login-extra-info">'
-              . '<span class="login-extra-info-divider"></span>'
-              . $this->t('{negotiate:negotiate:disabled_info}')
-              . '</span>';
-    } elseif($this->data['nego']['retry_id']) {
-         echo '<span id="login-extra-info-uio.no" class="login-extra-info">'
-              . '<span class="login-extra-info-divider"></span>'
-              . $this->t('{negotiate:negotiate:failed_info}')
-              . ' <a class="btn" href="'.SimpleSAML_Module::getModuleURL('negotiateext/retry', array('AuthState' => $this->data['nego']['retry_id'])).'">'
-              . $this->t('{negotiate:negotiate:retry_link}')
-              . '</a>'
-              . '</span>';
-    }
-    ?>
-
+<?php
+if ($this->data['nego']['disable_perm']) {
+    echo '<span id="login-extra-info-uio.no" class="login-extra-info">'
+          . '<span class="login-extra-info-divider"></span>'
+          . $this->t('{negotiate:negotiate:disabled_info}')
+          . '</span>';
+} elseif ($this->data['nego']['retry_id']) {
+     echo '<span id="login-extra-info-uio.no" class="login-extra-info">'
+          . '<span class="login-extra-info-divider"></span>'
+          . $this->t('{negotiate:negotiate:failed_info}')
+          . ' <a class="btn" href="'.SimpleSAML_Module::getModuleURL('negotiateext/retry', array('AuthState' => $this->data['nego']['retry_id'])).'">'
+          . $this->t('{negotiate:negotiate:retry_link}')
+          . '</a>'
+          . '</span>';
+}
+?>
+```
 
 The above may or may not work right out of the box for you but it is
 the gist of it. By looking at the state variable, cookie and checking
@@ -230,15 +223,13 @@ security check in SSP's state handling library. If you omit this and
 pass on the original state you will see a warning in the log like
 this:
 
-    Sep 27 13:47:36 simplesamlphp WARNING [b99e6131ee] Wrong stage in state. Was 'foo', should be 'sspmod_negotiateext_Auth_Source_Negotiate.StageId'.
+> Sep 27 13:47:36 simplesamlphp WARNING [b99e6131ee] Wrong stage in state. Was 'foo', should be 'sspmod_negotiateext_Auth_Source_Negotiate.StageId'.
 
 It will work as loadState will take control and call
 Negotiate->authenticate() but remaining code in retry.php will be
 discarded. Other side-effects may occur.
 
-
-Clients
--------
+## Clients
 
 * Internet Explorer
 
