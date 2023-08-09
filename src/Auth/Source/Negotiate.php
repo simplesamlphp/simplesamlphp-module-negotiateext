@@ -174,7 +174,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
      */
     protected function sendNegotiate(array $params): void
     {
-        $authPage = Module::getModuleURL('negotiateext/auth.php');
+        $authPage = Module::getModuleURL('negotiateext/auth');
         $httpUtils = new Utils\HTTP();
         $httpUtils->redirectTrustedURL($authPage, $params);
     }
