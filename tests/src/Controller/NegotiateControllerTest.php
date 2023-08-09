@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  *
  * @package SimpleSAML\Test
  */
-class NegotiateTest extends TestCase
+class NegotiateControllerTest extends TestCase
 {
     /** @var \SimpleSAML\Configuration */
     protected Configuration $config;
