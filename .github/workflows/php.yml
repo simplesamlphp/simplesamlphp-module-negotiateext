@@ -72,7 +72,7 @@ jobs:
         run: composer validate
 
       - name: Install Composer dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader --ignore-platform-req ext-krb5
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
 
       - name: Check code for hard dependencies missing in composer.json
         run: composer-require-checker check --config-file=tools/composer-require-checker.json composer.json
@@ -135,13 +135,13 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Composer dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader --ignore-platform-req ext-krb5
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
 
       - name: Security check for locked dependencies
         run: composer audit
 
       - name: Update Composer dependencies
-        run: composer update --no-progress --prefer-dist --optimize-autoloader --ignore-platform-req ext-krb5
+        run: composer update --no-progress --prefer-dist --optimize-autoloader
 
       - name: Security check for updated dependencies
         run: composer audit
@@ -157,6 +157,9 @@ jobs:
         php-versions: ['8.0', '8.1', '8.2']
 
     steps:
+      - name: Install libkrb5-dev
+        run: sudo apt-get install -y libkrb5-dev
+
       - name: Setup PHP, with composer and extensions
         # https://github.com/shivammathur/setup-php
         uses: shivammathur/setup-php@v2
@@ -191,7 +194,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Composer dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader --ignore-platform-req ext-krb5
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
 
       - name: Run unit tests with coverage
         if: ${{ matrix.php-versions == '8.2' }}
@@ -253,7 +256,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Composer dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader --ignore-platform-req ext-krb5
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
 
       - name: Run unit tests
         run: vendor/bin/phpunit --no-coverage
