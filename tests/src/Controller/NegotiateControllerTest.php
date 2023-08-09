@@ -53,14 +53,9 @@ class NegotiateTest extends TestCase
      */
     public function testAuth(): void
     {
-        $request = Request::create(
-            '/auth',
-            'GET'
-        );
-
         $c = new Controller\NegotiateController($this->config, $this->session);
 
-        $response = $c->auth($request);
+        $response = $c->auth();
 
         $this->assertInstanceOf(RunnableResponse::class, $response);
         $this->assertTrue($response->isSuccessful());
@@ -130,15 +125,10 @@ class NegotiateTest extends TestCase
      */
     public function testEnable(): void
     {
-        $request = Request::create(
-            '/enable',
-            'GET'
-        );
-
         $c = new Controller\NegotiateController($this->config, $this->session);
 
         /** @var \SimpleSAML\XHTML\Template $response */
-        $response = $c->enable($request);
+        $response = $c->enable();
 
         // Validate response
         $this->assertInstanceOf(Template::class, $response);
@@ -167,15 +157,10 @@ class NegotiateTest extends TestCase
      */
     public function testDisable(): void
     {
-        $request = Request::create(
-            '/disable',
-            'GET'
-        );
-
         $c = new Controller\NegotiateController($this->config, $this->session);
 
         /** @var \SimpleSAML\XHTML\Template $response */
-        $response = $c->disable($request);
+        $response = $c->disable();
 
         // Validate response
         $this->assertInstanceOf(Template::class, $response);
