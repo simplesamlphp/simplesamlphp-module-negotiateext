@@ -15,9 +15,7 @@ use SimpleSAML\Module;
 use SimpleSAML\Module\negotiateext\Auth\Source\Negotiate;
 use SimpleSAML\Session;
 use SimpleSAML\XHTML\Template;
-use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\{Cookie, RedirectResponse, Request};
 
 /**
  * Controller class for the negotiate module.

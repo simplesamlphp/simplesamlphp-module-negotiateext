@@ -12,7 +12,6 @@ use SimpleSAML\Module\negotiateext\Controller;
 use SimpleSAML\Session;
 use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Set of tests for the controllers in the "negotiate" module.
