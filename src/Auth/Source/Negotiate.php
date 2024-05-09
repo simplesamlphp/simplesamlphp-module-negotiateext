@@ -12,13 +12,13 @@ use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Session;
 use SimpleSAML\Utils;
+use Symfony\Component\HttpFoundation\{IpUtils, Request};
 
 /**
  * The Negotiate module. Allows for password-less, secure login by Kerberos and Negotiate.
  *
  * @package simplesamlphp/simplesamlphp-module-negotiate
  */
-
 class Negotiate extends \SimpleSAML\Auth\Source
 {
     // Constants used in the module
@@ -99,8 +99,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
             assert(false);
         }
 
-        $mask = $this->checkMask();
-        if (!$mask) {
+        if (!$this->checkMask()) {
             $this->fallBack($state);
             // never executed
             assert(false);
@@ -152,15 +151,15 @@ class Negotiate extends \SimpleSAML\Auth\Source
         if ($this->subnet === null) {
             return true;
         }
-        $ip = $_SERVER['REMOTE_ADDR'];
-        $netUtils = new Utils\Net();
-        foreach ($this->subnet as $cidr) {
-            $ret = $netUtils->ipCIDRcheck($cidr);
-            if ($ret) {
-                Logger::debug('Negotiate: Client "' . $ip . '" matched subnet.');
-                return true;
-            }
+
+        $ip = Request::createFromGlobals()->getClientIp();
+        Assert::notNull($ip, "Unable to determine client IP.");
+
+        if (IpUtils::checkIp($ip, $this->subnet)) {
+            Logger::debug('Negotiate: Client "' . $ip . '" matched subnet.');
+            return true;
         }
+
         Logger::debug('Negotiate: Client "' . $ip . '" did not match subnet.');
         return false;
     }
