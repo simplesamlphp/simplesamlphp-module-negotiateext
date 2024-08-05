@@ -38,7 +38,7 @@ class NegotiateControllerTest extends TestCase
                 'module.enable' => ['negotiateext' => true],
             ],
             '[ARRAY]',
-            'simplesaml'
+            'simplesaml',
         );
 
         $this->session = Session::getSessionFromRequest();
@@ -87,7 +87,7 @@ class NegotiateControllerTest extends TestCase
     {
         $request = Request::create(
             '/error',
-            'GET'
+            'GET',
         );
 
         $c = new Controller\NegotiateController($this->config, $this->session);
@@ -107,7 +107,7 @@ class NegotiateControllerTest extends TestCase
         $request = Request::create(
             '/error',
             'GET',
-            ['AuthState' => 'someState']
+            ['AuthState' => 'someState'],
         );
 
         $c = new Controller\NegotiateController($this->config, $this->session);
@@ -211,7 +211,7 @@ class NegotiateControllerTest extends TestCase
     {
         $request = Request::create(
             '/retry',
-            'GET'
+            'GET',
         );
 
         $c = new Controller\NegotiateController($this->config, $this->session);
@@ -231,7 +231,7 @@ class NegotiateControllerTest extends TestCase
         $request = Request::create(
             '/retry',
             'GET',
-            ['AuthState' => 'someState']
+            ['AuthState' => 'someState'],
         );
 
         $c = new Controller\NegotiateController($this->config, $this->session);
@@ -270,7 +270,7 @@ class NegotiateControllerTest extends TestCase
     {
         $request = Request::create(
             '/backend',
-            'GET'
+            'GET',
         );
 
         $c = new Controller\NegotiateController($this->config, $this->session);
@@ -290,7 +290,7 @@ class NegotiateControllerTest extends TestCase
         $request = Request::create(
             '/backend',
             'GET',
-            ['AuthState' => 'someState']
+            ['AuthState' => 'someState'],
         );
 
         $c = new Controller\NegotiateController($this->config, $this->session);

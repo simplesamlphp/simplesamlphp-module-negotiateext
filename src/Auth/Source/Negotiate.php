@@ -278,7 +278,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
                  * while the user is at the login page.
                  */
                 throw new Error\Exception(
-                    'Could not find authentication source with id ' . $state['negotiate:authId']
+                    'Could not find authentication source with id ' . $state['negotiate:authId'],
                 );
             }
             /*

@@ -45,7 +45,7 @@ class NegotiateController
      */
     public function __construct(
         Configuration $config,
-        Session $session
+        Session $session,
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -102,7 +102,7 @@ class NegotiateController
             '/', // path
             '', // domain
             true, // secure
-            true // httponly
+            true, // httponly
         );
 
         $t = new Template($this->config, 'negotiateext:enable.twig');
@@ -129,7 +129,7 @@ class NegotiateController
             '/', // path
             '', // domain
             true, // secure
-            true // httponly
+            true, // httponly
         );
 
         $t = new Template($this->config, 'negotiateext:disable.twig');
