@@ -19,12 +19,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  *
  * @package SimpleSAML\Test
  */
-class NegotiateControllerTest extends TestCase
+final class NegotiateControllerTest extends TestCase
 {
-    /** @var \SimpleSAML\Configuration */
     protected Configuration $config;
-
-    /** @var \SimpleSAML\Session */
     protected Session $session;
 
     /**
@@ -126,8 +123,6 @@ class NegotiateControllerTest extends TestCase
     public function testEnable(): void
     {
         $c = new Controller\NegotiateController($this->config, $this->session);
-
-        /** @var \SimpleSAML\XHTML\Template $response */
         $response = $c->enable();
 
         // Validate response
@@ -158,8 +153,6 @@ class NegotiateControllerTest extends TestCase
     public function testDisable(): void
     {
         $c = new Controller\NegotiateController($this->config, $this->session);
-
-        /** @var \SimpleSAML\XHTML\Template $response */
         $response = $c->disable();
 
         // Validate response
