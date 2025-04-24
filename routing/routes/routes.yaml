@@ -1,29 +1,43 @@
+---
+
 negotiate-auth:
-    path:       /auth
-    defaults:   { _controller: 'SimpleSAML\Module\negotiateext\Controller\NegotiateController::auth' }
-    methods:    [GET]
+  path: /auth
+  defaults: {
+    _controller: 'SimpleSAML\Module\negotiateext\Controller\NegotiateController::auth'
+  }
+  methods: [GET]
 
 negotiate-error:
-    path:       /error
-    defaults:   { _controller: 'SimpleSAML\Module\negotiateext\Controller\NegotiateController::error' }
-    methods:    [GET]
+  path: /error
+  defaults: {
+    _controller: 'SimpleSAML\Module\negotiateext\Controller\NegotiateController::error'
+  }
+  methods: [GET]
 
 negotiate-enable:
-    path:       /enable
-    defaults:   { _controller: 'SimpleSAML\Module\negotiateext\Controller\NegotiateController::enable' }
-    methods:    [GET]
+  path: /enable
+  defaults: {
+    _controller: 'SimpleSAML\Module\negotiateext\Controller\NegotiateController::enable'
+  }
+  methods: [GET]
 
 negotiate-disable:
-    path:       /disable
-    defaults:   { _controller: 'SimpleSAML\Module\negotiateext\Controller\NegotiateController::disable' }
-    methods:    [GET]
+  path: /disable
+  defaults: {
+    _controller: 'SimpleSAML\Module\negotiateext\Controller\NegotiateController::disable'
+  }
+  methods: [GET]
 
 negotiate-retry:
-    path:       /retry
-    defaults:   { _controller: 'SimpleSAML\Module\negotiateext\Controller\NegotiateController::retry' }
-    methods:    [GET]
+  path: /retry
+  defaults: {
+    _controller: 'SimpleSAML\Module\negotiateext\Controller\NegotiateController::retry'
+  }
+  methods: [GET]
 
 negotiate-fallback:
-    path:       /fallback
-    defaults:   { _controller: 'SimpleSAML\Module\negotiateext\Controller\NegotiateController::fallback' }
-    methods:    [GET]
+  path: /fallback
+  defaults: {
+    _controller: 'SimpleSAML\Module\negotiateext\Controller\NegotiateController::fallback'
+  }
+  methods: [GET]
