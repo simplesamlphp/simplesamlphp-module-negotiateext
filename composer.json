@@ -37,16 +37,16 @@
         "ssp-mixedcase-module-name": "negotiateext"
     },
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
 
-        "simplesamlphp/composer-module-installer": "^1.3.4",
-        "simplesamlphp/assert": "^1.2",
-        "simplesamlphp/simplesamlphp": "^2.2",
+        "simplesamlphp/composer-module-installer": "^1.5.0",
+        "simplesamlphp/assert": "^1.9.1",
+        "simplesamlphp/simplesamlphp": "^2.4",
         "simplesamlphp/simplesamlphp-module-ldap": "^2.3",
         "symfony/http-foundation": "^6.4"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp-test-framework": "^1.7.9"
+        "simplesamlphp/simplesamlphp-test-framework": "^1.10.3"
     },
     "support": {
         "issues": "https://github.com/tvdijen/simplesamlphp-module-negotiateext/issues",
