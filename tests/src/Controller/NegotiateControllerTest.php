@@ -130,12 +130,14 @@ final class NegotiateControllerTest extends TestCase
 
         // Validate cookie
         $cookies = $response->headers->getCookies();
+        $cookie = null;
         foreach ($cookies as $cookie) {
             if ($cookie->getName() === 'NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT') {
                 break;
             }
         }
 
+        $this->assertNotNull($cookie);
         $this->assertEquals($cookie->getValue(), null);
         $this->assertEquals($cookie->getDomain(), null);
         $this->assertEquals($cookie->getPath(), '/');
@@ -160,12 +162,14 @@ final class NegotiateControllerTest extends TestCase
 
         // Validate cookie
         $cookies = $response->headers->getCookies();
+        $cookie = null;
         foreach ($cookies as $cookie) {
             if ($cookie->getName() === 'NEGOTIATE_AUTOLOGIN_DISABLE_PERMANENT') {
                 break;
             }
         }
 
+        $this->assertNotNull($cookie);
         $this->assertEquals($cookie->getValue(), 'true');
         $this->assertEquals($cookie->getDomain(), null);
         $this->assertEquals($cookie->getPath(), '/');

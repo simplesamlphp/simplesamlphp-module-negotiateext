@@ -67,7 +67,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
      *
      * @param array &$state Information about the current authentication.
      */
-    public function authenticate(array &$state): void
+    public function authenticate(array &$state): never
     {
         // set the default backend to config
         $state['LogoutState'] = [
@@ -95,14 +95,10 @@ class Negotiate extends \SimpleSAML\Auth\Source
         ) {
             Logger::debug('Negotiate - session disabled. falling back');
             $this->fallBack($state);
-            // never executed
-            assert(false);
         }
 
         if (!$this->checkMask()) {
             $this->fallBack($state);
-            // never executed
-            assert(false);
         }
 
         // No auth token. Send it.
@@ -235,16 +231,12 @@ class Negotiate extends \SimpleSAML\Auth\Source
             ];
             Logger::info('Negotiate - authenticate(): ' . $user . ' authorized.');
             Auth\Source::completeAuth($state);
-            // Never reached.
-            assert(false);
         }
     }
 
 
     /**
      * Passes control of the login process to a different module.
-     *
-     * @param string $state Information about the current authentication.
      *
      * @throws \SimpleSAML\Error\BadRequest If couldn't determine the auth source.
      * @throws \SimpleSAML\Error\NoState
@@ -265,7 +257,6 @@ class Negotiate extends \SimpleSAML\Auth\Source
             }
             $httpUtils = new Utils\HTTP();
             $httpUtils->redirectUntrustedURL($sid['url'], ['negotiateext.auth' => 'false']);
-            assert(false);
         }
 
         Assert::isArray($state);
@@ -294,7 +285,6 @@ class Negotiate extends \SimpleSAML\Auth\Source
         }
 
         self::fallBack($state);
-        assert(false);
     }
 
 
