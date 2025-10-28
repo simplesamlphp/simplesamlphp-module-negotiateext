@@ -15,7 +15,9 @@ use SimpleSAML\Module;
 use SimpleSAML\Module\negotiateext\Auth\Source\Negotiate;
 use SimpleSAML\Session;
 use SimpleSAML\XHTML\Template;
-use Symfony\Component\HttpFoundation\{Cookie, RedirectResponse, Request};
+use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Controller class for the negotiate module.
@@ -66,7 +68,7 @@ class NegotiateController
     /**
      * Process authentication error
      *
-     * @param Request $request The request that lead to this retry operation.
+     * @param \Symfony\Component\HttpFoundation\Request $request The request that lead to this retry operation.
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function error(Request $request): RedirectResponse
@@ -143,7 +145,7 @@ class NegotiateController
     /**
      * Show retry
      *
-     * @param Request $request The request that lead to this retry operation.
+     * @param \Symfony\Component\HttpFoundation\Request $request The request that lead to this retry operation.
      * @return \SimpleSAML\HTTP\RunnableResponse
      */
     public function retry(Request $request): RunnableResponse
@@ -178,7 +180,7 @@ class NegotiateController
     /**
      * Show fallback
      *
-     * @param Request $request The request that lead to this retry operation.
+     * @param \Symfony\Component\HttpFoundation\Request $request The request that lead to this retry operation.
      * @return \SimpleSAML\HTTP\RunnableResponse
      */
     public function fallback(Request $request): RunnableResponse

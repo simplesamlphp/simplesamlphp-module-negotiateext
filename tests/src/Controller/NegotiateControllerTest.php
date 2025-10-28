@@ -21,7 +21,9 @@ use Symfony\Component\HttpFoundation\Request;
 final class NegotiateControllerTest extends TestCase
 {
     protected Configuration $config;
+
     protected Session $session;
+
 
     /**
      * Set up for each test.

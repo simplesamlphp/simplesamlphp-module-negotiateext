@@ -12,7 +12,8 @@ use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Session;
 use SimpleSAML\Utils;
-use Symfony\Component\HttpFoundation\{IpUtils, Request};
+use Symfony\Component\HttpFoundation\IpUtils;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * The Negotiate module. Allows for password-less, secure login by Kerberos and Negotiate.
@@ -23,6 +24,7 @@ class Negotiate extends \SimpleSAML\Auth\Source
 {
     // Constants used in the module
     public const STAGEID = '\SimpleSAML\Module\negotiateext\Auth\Source\Negotiate.StageId';
+
 
     /** @var string */
     protected string $backend;
