@@ -23,19 +23,15 @@ use Symfony\Component\HttpFoundation\Request;
 class Negotiate extends \SimpleSAML\Auth\Source
 {
     // Constants used in the module
-    public const STAGEID = '\SimpleSAML\Module\negotiateext\Auth\Source\Negotiate.StageId';
+    public const string STAGEID = '\SimpleSAML\Module\negotiateext\Auth\Source\Negotiate.StageId';
 
 
-    /** @var string */
     protected string $backend;
 
-    /** @var string */
     protected string $fallback;
 
-    /** @var string */
     protected string $keytab = '';
 
-    /** @var array|null */
     protected ?array $subnet = null;
 
 

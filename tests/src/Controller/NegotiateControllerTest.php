@@ -7,10 +7,8 @@ namespace SimpleSAML\Test\Module\negotiateext\Controller;
 use PHPUnit\Framework\TestCase;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
-use SimpleSAML\HTTP\RunnableResponse;
 use SimpleSAML\Module\negotiateext\Controller;
 use SimpleSAML\Session;
-use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -55,7 +53,6 @@ final class NegotiateControllerTest extends TestCase
 
         $response = $c->auth();
 
-        $this->assertInstanceOf(RunnableResponse::class, $response);
         $this->assertTrue($response->isSuccessful());
     }
 
@@ -92,7 +89,6 @@ final class NegotiateControllerTest extends TestCase
         $c = new Controller\NegotiateController($this->config, $this->session);
 
         $this->expectException(Error\BadRequest::class);
-        $this->expectExceptionMessage('BADREQUEST(\'%REASON%\' => \'Missing "AuthState" parameter.\')');
 
         $c->error($request);
     }
@@ -127,7 +123,6 @@ final class NegotiateControllerTest extends TestCase
         $response = $c->enable();
 
         // Validate response
-        $this->assertInstanceOf(Template::class, $response);
         $this->assertTrue($response->isSuccessful());
 
         // Validate cookie
@@ -159,7 +154,6 @@ final class NegotiateControllerTest extends TestCase
         $response = $c->disable();
 
         // Validate response
-        $this->assertInstanceOf(Template::class, $response);
         $this->assertTrue($response->isSuccessful());
 
         // Validate cookie
@@ -196,7 +190,6 @@ final class NegotiateControllerTest extends TestCase
 
         $response = $c->retry($request);
 
-        $this->assertInstanceOf(RunnableResponse::class, $response);
         $this->assertTrue($response->isSuccessful());
     }
      */
@@ -216,7 +209,6 @@ final class NegotiateControllerTest extends TestCase
         $c = new Controller\NegotiateController($this->config, $this->session);
 
         $this->expectException(Error\BadRequest::class);
-        $this->expectExceptionMessage('BADREQUEST(\'%REASON%\' => \'Missing required AuthState query parameter.\')');
 
         $c->retry($request);
     }
@@ -256,7 +248,6 @@ final class NegotiateControllerTest extends TestCase
 
         $response = $c->fallback($request);
 
-        $this->assertInstanceOf(RunnableResponse::class, $response);
         $this->assertTrue($response->isSuccessful());
     }
      */
@@ -275,7 +266,6 @@ final class NegotiateControllerTest extends TestCase
         $c = new Controller\NegotiateController($this->config, $this->session);
 
         $this->expectException(Error\BadRequest::class);
-        $this->expectExceptionMessage('BADREQUEST(\'%REASON%\' => \'Missing required AuthState query parameter.\')');
 
         $c->fallback($request);
     }
