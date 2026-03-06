@@ -39,8 +39,8 @@
     "require": {
         "php": "^8.3",
 
-        "simplesamlphp/composer-module-installer": "^1.5",
-        "simplesamlphp/assert": "^1.9",
+        "simplesamlphp/composer-module-installer": "^1.7",
+        "simplesamlphp/assert": "^2.0",
         "simplesamlphp/simplesamlphp": "^2.5@dev",
         "simplesamlphp/simplesamlphp-module-ldap": "^2.5",
         "symfony/http-foundation": "^7.4"
